@@ -105,7 +105,7 @@ function ConvertFrom-RegEx {
                     }
             }
         } -ErrorAction Stop `
-        | Set-Variable $pipelineOutputs
+        | Set-Variable "pipelineOutputs"
 
 
         If ($null -eq $pipelineOutputs) {

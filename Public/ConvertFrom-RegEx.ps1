@@ -96,7 +96,7 @@ function ConvertFrom-RegEx {
                 | ForEach-Object Groups `
                 | Where-Object Name -ne 0 `
                 | ForEach-Object `
-                    -Begin {$out = @{}} `
+                    -Begin {$out = [ordered]@{}} `
                     -Process {
                         $out[$_.Name] = $_.Captures.Value 
                     } `

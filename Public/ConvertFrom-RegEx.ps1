@@ -70,7 +70,7 @@ function ConvertFrom-RegEx {
         # Open all of the pipelines
         $SelectStringPipelines | ForEach-Object {
             try {
-                $_.Begin($PSCmdlet)
+                $_.Begin($true)
             } catch {
                 throw
             }

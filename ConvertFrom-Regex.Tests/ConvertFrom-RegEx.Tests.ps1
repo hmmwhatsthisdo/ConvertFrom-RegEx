@@ -2,7 +2,7 @@ Describe "ConvertFrom-RegEx" {
 
     BeforeAll {
         Import-Module .\ConvertFrom-RegEx -ErrorAction Stop -Force
-        Import-Module Functional -DisableNameChecking -Force
+        Import-Module Assert -Force
     }
 
     Context "Output Comparison" {
@@ -18,7 +18,7 @@ Describe "ConvertFrom-RegEx" {
             }
         ) {
             $ActualValue = $InputString | ConvertFrom-RegEx -Pattern $Regex
-            $ActualValue, $ExpectedValue | Test-Equality | Should -BeTrue -Because "$ActualValue should be deeply equal to $ExpectedValue"
+            Assert-Equivalent -Actual $ActualValue -Expected $ExpectedValue -StrictOrder
         }
     }
 }

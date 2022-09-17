@@ -106,12 +106,13 @@ function ConvertFrom-RegEx {
                 throw    
             }
             
-            If ($null -eq $pipelineRet) {
+            If (-not $pipelineRet) {
                 # No match found
             } else {
                 $pipelineRet `
                 | ForEach-Object Matches `
-                | ForEach-Object Groups `
+                | ForEach-Object {
+                    $_.Groups `
                 | Where-Object Name -ne 0 `
                 | ForEach-Object `
                     -Begin {$out = [ordered]@{}} `
@@ -121,6 +122,7 @@ function ConvertFrom-RegEx {
                     -End {
                         Write-Output ([PSCustomObject]$out)
                     }
+                }
             }
         } -ErrorAction Stop `
         | Set-Variable "pipelineOutputs"

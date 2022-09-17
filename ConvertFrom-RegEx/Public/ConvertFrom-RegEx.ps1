@@ -1,3 +1,28 @@
+<#
+.SYNOPSIS
+    Extract structured objects from text using Regular Expression Capture Groups
+.DESCRIPTION
+    The `ConvertFrom-RegEx` cmdlet uses regular expression (RegEx) matching to search for text patterns in input strings and files. Using RegEx capture groups, text can be quickly extracted into PowerShell objects.
+.NOTES
+    For more information on capture groups in .NET Regular Expressions, see https://learn.microsoft.com/en-us/dotnet/standard/base-types/grouping-constructs-in-regular-expressions in the .NET documentation.
+.EXAMPLE
+    "A=1, B=2, C=3, C=4" | ConvertFrom-RegEx -Pattern "A=(?<A>\d+), B=(?<B>\d+), (?:C=(?<C>\d+)[,\s]*)+"
+
+    A B C
+    - - -
+    1 2 {3, 4}
+    
+    Match the string "A=1, B=2, C=3, C=4" with the provided regular expression. Values from capture groups A and B are directly translated to their corresponding properties. As capture group C captures multiple times within a given match, its captures are returned as an array.
+.EXAMPLE
+    "A=1, B=2, C=3, C=4 | A=3, B=4, C=5, C=6" | ConvertFrom-RegEx -Pattern "A=(?<A>\d+), B=(?<B>\d+), (?:C=(?<C>\d+)[,\s]*)+" -AllMatches
+
+    A B C
+    - - -
+    1 2 {3, 4}
+    3 4 {5, 6}
+
+    Match the string "A=1, B=2, C=3, C=4 | A=3, B=4, C=5, C=6" with the provided regular expression. As the -AllMatches parameter was specified, both the first and seconf halves of the string each result in their own object.
+#>
 function ConvertFrom-RegEx {
     [CmdletBinding(
         DefaultParameterSetName="File"
@@ -122,15 +147,15 @@ function ConvertFrom-RegEx {
                 | ForEach-Object Matches `
                 | ForEach-Object {
                     $_.Groups `
-                | Where-Object Name -ne 0 `
-                | ForEach-Object `
-                    -Begin {$out = [ordered]@{}} `
-                    -Process {
-                        $out[$_.Name] = $_.Captures.Value 
-                    } `
-                    -End {
-                        Write-Output ([PSCustomObject]$out)
-                    }
+                    | Where-Object Name -ne 0 `
+                    | ForEach-Object `
+                        -Begin {$out = [ordered]@{}} `
+                        -Process {
+                            $out[$_.Name] = $_.Captures.Value 
+                        } `
+                        -End {
+                            Write-Output ([PSCustomObject]$out)
+                        }
                 }
             }
         } -ErrorAction Stop `

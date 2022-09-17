@@ -31,7 +31,16 @@ function ConvertFrom-RegEx {
             Mandatory,
             Position=0
         )]
-        [string[]]
+        [ValidateScript({
+            try {
+                Assert-ValidCGRegex -Pattern $_ -ErrorAction Stop
+            }
+            catch {
+                throw ([System.Management.Automation.ValidationMetadataException]::new($_.Exception.Message))
+            }
+            return $true
+        })]
+        [RegEx[]]
         $Pattern,
 
         # A path to one or more files to parse. Wildcards are supported.

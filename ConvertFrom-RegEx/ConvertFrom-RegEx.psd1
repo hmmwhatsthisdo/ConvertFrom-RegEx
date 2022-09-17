@@ -97,7 +97,8 @@ PrivateData = @{
         # Tags applied to this module. These help with module discovery in online galleries.
         Tags = @(
             "RegEx"
-            "Regular Expression"
+            "RegularExpression"
+            "Regular-Expression"
         )
 
         # A URL to the license for this module.

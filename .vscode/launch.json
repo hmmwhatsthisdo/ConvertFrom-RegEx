@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "PowerShell: Debug Pester tests",
+            "type": "PowerShell",
+            "request": "launch",
+            "cwd": "",
+            "script": "Invoke-Pester -Output Detailed"
+        },
+        {
             "name": "PowerShell: Interactive Session",
             "type": "PowerShell",
             "request": "launch",

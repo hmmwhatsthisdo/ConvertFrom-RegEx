@@ -30,7 +30,7 @@ CompanyName = 'N/A'
 Copyright = '(c) hmmwhatsthisdo. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'PowerShell module for deserializing text via Regular Expressions'
 
 # Minimum version of the PowerShell engine required by this module
 # PowerShellVersion = ''

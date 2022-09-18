@@ -102,17 +102,23 @@ function ConvertFrom-RegEx {
     )
     
     begin {
+
+
+        # Pipelines should receive similar parameters under most circumstances, so load all of these into a hashtable and clone as necessary.
+        $SelectStringParams = @{
+            CaseSensitive = $CaseSensitive
+            AllMatches = $AllMatches
+        }
+        If ($null -ne $Path) {
+            $SelectStringParams["Path"] = $Path
+        } elseif ($null -ne $LiteralPath) {
+            $SelectStringParams["LiteralPath"] = $LiteralPath
+        }
+
         # Build steppable pipelines for each provided regex
         $Pattern | ForEach-Object {
-            $SelectStringSplat = @{
+            $SelectStringSplat = $SelectStringParams + @{
                 Pattern = $_
-                CaseSensitive = $CaseSensitive
-                AllMatches = $AllMatches
-            }
-            If ($null -ne $Path) {
-                $SelectStringSplat["Path"] = $Path
-            } elseif ($null -ne $LiteralPath) {
-                $SelectStringSplat["LiteralPath"] = $LiteralPath
             }
 
             {Select-String @SelectStringSplat}.GetSteppablePipeline($myInvocation.CommandOrigin)
@@ -122,7 +128,7 @@ function ConvertFrom-RegEx {
         # Open all of the pipelines
         $SelectStringPipelines | ForEach-Object {
             try {
-                $_.Begin($true)
+                $_.Begin($PSCmdlet.MyInvocation.ExpectingInput)
             } catch {
                 throw
             }

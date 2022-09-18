@@ -21,7 +21,7 @@
     1 2 {3, 4}
     3 4 {5, 6}
 
-    Match the string "A=1, B=2, C=3, C=4 | A=3, B=4, C=5, C=6" with the provided regular expression. As the -AllMatches parameter was specified, both the first and seconf halves of the string each result in their own object.
+    Match the string "A=1, B=2, C=3, C=4 | A=3, B=4, C=5, C=6" with the provided regular expression. As the -AllMatches parameter was specified, both the first and second halves of the string each result in their own object.
 #>
 function ConvertFrom-RegEx {
     [CmdletBinding(

@@ -8,6 +8,14 @@ PowerShell's data transformation and manipulation functions work best on objects
 
 The module uses `Select-String` internally to perform matching, with some additional abstractions to convert matches into usable objects. (Many parameters function similarly to those exposed by `Select-String`.)
 
+## Features
+* Object deserialization from string data
+* Object deserialization from file(s) (akin to `Select-String -Path` or `Select-String -LiteralPath`)
+
+## Supported Versions
+* Windows PowerShell 5.1
+* PowerShell 7.2 or later
+
 ## Dependencies
 None. `ConvertFrom-RegEx` is self-contained and relies only upon in-box PowerShell/.NET functionality.
 

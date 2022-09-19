@@ -155,7 +155,13 @@ function ConvertFrom-RegEx {
                     $_.Groups `
                     | Where-Object Name -ne 0 `
                     | ForEach-Object `
-                        -Begin {$out = [ordered]@{}} `
+                        -Begin {
+                            [Diagnostics.CodeAnalysis.SuppressMessage(
+                                MessageId ='PSUseDeclaredVarsMoreThanAssignments',
+                                Justification = 'Variable is used in downstream scope'
+                            )]
+                            $out = [ordered]@{}
+                        } `
                         -Process {
                             $out[$_.Name] = $_.Captures.Value 
                         } `

@@ -31,6 +31,36 @@ Install-Module ConvertFrom-RegEx
 >   
 > Updating PowerShellGet to the latest version is recommended - see [Installing PowerShellGet](https://learn.microsoft.com/en-us/powershell/scripting/gallery/installing-psget) on Microsoft Docs for more information.
 
+## Usage/Examples
+
+To use ConvertFrom-RegEx, import the module into your PowerShell session and pass string data or files to the `ConvertFrom-RegEx` commandlet. Pipeline and parameter-based input is supported - see examples below.
+
+### Simple deserialization from pipeline
+
+```powershell
+PS> "A=1, B=2, C=3, C=4" | ConvertFrom-RegEx -Pattern "A=(?<A>\d+), B=(?<B>\d+), (?:C=(?<C>\d+)[,\s]*)+"
+
+A B C
+- - -
+1 2 {3, 4}
+```
+Match the string `A=1, B=2, C=3, C=4` with the provided regular expression. Values from capture groups A and B are directly translated to their corresponding properties. As capture group C captures multiple times within a given match, its captures are returned as an array.
+
+### Deserialize multiple objects from one line
+
+```powershell
+"A=1, B=2, C=3, C=4 | A=3, B=4, C=5, C=6" | ConvertFrom-RegEx -Pattern "A=(?<A>\d+), B=(?<B>\d+), (?:C=(?<C>\d+)[,\s]*)+" -AllMatches
+
+A B C
+- - -
+1 2 {3, 4}
+3 4 {5, 6}
+```
+Match the string `A=1, B=2, C=3, C=4 | A=3, B=4, C=5, C=6` with the same regular expression as the previous example. As the `-AllMatches` parameter was specified, both the first and second halves of the string each result in their own object.
+
+
+
+
 ## Limitations
 * `Select-String` does not expose a method for setting the .NET RegEx `MatchTimeout` parameter. Patterns that require excessive backtracking (nested optional qualifiers, lookarounds, etc.) may exhibit performance degradation. Untrusted source content can contain strings designed to exploit this behavior, leading to a denial-of-service attack.
 

@@ -55,10 +55,16 @@ Describe "ConvertFrom-RegEx" {
                 AdditionalParameters = @{
                     AllMatches = $true
                 }
-            },
+            }
+        ) {
+            $ActualValue = $InputString | ConvertFrom-RegEx -Pattern $Regex @AdditionalParameters
+            Assert-Equivalent -Actual $ActualValue -Expected $ExpectedValue -StrictOrder
+        }
+
+        It "Should parse file <inputfile> with regex <regexfile>" -ForEach @(
             @{
-                InputString = Get-Content .\ConvertFrom-Regex.Tests\SyslogTest.log
-                Regex = Get-Content .\ConvertFrom-Regex.Tests\SyslogRegex.rgx -Raw
+                InputFile = ".\ConvertFrom-Regex.Tests\SyslogTest.log"
+                RegExFile = ".\ConvertFrom-Regex.Tests\SyslogRegex.rgx"
                 ExpectedValue = @(
                     [PSCustomObject]@{
                         month = "Sep"
@@ -109,7 +115,7 @@ Describe "ConvertFrom-RegEx" {
                 AdditionalParameters = @{}
             }
         ) {
-            $ActualValue = $InputString | ConvertFrom-RegEx -Pattern $Regex @AdditionalParameters
+            $ActualValue = Get-Item -Path $InputFile | ConvertFrom-RegEx -Pattern (Get-Content $RegExFile -Raw) @AdditionalParameters
             Assert-Equivalent -Actual $ActualValue -Expected $ExpectedValue -StrictOrder
         }
     }

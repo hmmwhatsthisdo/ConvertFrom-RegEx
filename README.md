@@ -29,7 +29,7 @@ Install-Module ConvertFrom-RegEx
 > [!NOTE]
 > PowerShellGet ships in-box with PowerShell 5.1 and later - however, the version installed may lack the requisite features needed to install modules from the PowerShell Gallery.
 >   
-> Updating PowerShellGet to the latest is recommended - see [Installing PowerShellGet](https://learn.microsoft.com/en-us/powershell/scripting/gallery/installing-psget) on Microsoft Docs for more information.
+> Updating PowerShellGet to the latest version is recommended - see [Installing PowerShellGet](https://learn.microsoft.com/en-us/powershell/scripting/gallery/installing-psget) on Microsoft Docs for more information.
 
 ## Limitations
 * `Select-String` does not expose a method for setting the .NET RegEx `MatchTimeout` parameter. Patterns that require excessive backtracking (nested optional qualifiers, lookarounds, etc.) may exhibit performance degradation. Untrusted source content can contain strings designed to exploit this behavior, leading to a denial-of-service attack.

@@ -1,0 +1,36 @@
+(?nx)
+^               # Start of line
+(?<month>       # Matching group ("month")
+    \S+         # Match any non-whitespace
+)
+\s+
+(?<day>
+    \d{1,2}     # Match 1 or two digits
+)
+\s+
+(?<time>        
+    \d{1,2}
+    :
+    \d{1,2}
+    :
+    \d{1,2}
+)               # Match hh:mm:ss timestamp format
+\s+
+(?<hostname>
+    \S+
+)
+\s+
+(?<daemon>      # Match daemon/bracketed PID (e.g. "systemd[1]")
+    \S+
+)
+\[              
+    (?<PID>
+        \d+
+    )
+\]
+:
+\s
+(?<message>
+    .*          # Match remainder of line
+)
+$               # End of string

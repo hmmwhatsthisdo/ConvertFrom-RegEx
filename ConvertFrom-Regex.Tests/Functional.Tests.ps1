@@ -55,6 +55,58 @@ Describe "ConvertFrom-RegEx" {
                 AdditionalParameters = @{
                     AllMatches = $true
                 }
+            },
+            @{
+                InputString = Get-Content .\ConvertFrom-Regex.Tests\SyslogTest.log
+                Regex = Get-Content .\ConvertFrom-Regex.Tests\SyslogRegex.rgx -Raw
+                ExpectedValue = @(
+                    [PSCustomObject]@{
+                        month = "Sep"
+                        day = "18"
+                        time = "00:00:30"
+                        hostname = "exampleserver"
+                        daemon = "systemd"
+                        PID = "1"
+                        message = "logrotate.service: Succeeded."
+                    },
+                    [PSCustomObject]@{
+                        month = "Sep"
+                        day = "18"
+                        time = "00:00:30"
+                        hostname = "exampleserver"
+                        daemon = "systemd"
+                        PID = "1"
+                        message = "Finished Rotate log files."
+                    },
+                    [PSCustomObject]@{
+                        month = "Sep"
+                        day = "18"
+                        time = "00:00:31"
+                        hostname = "exampleserver"
+                        daemon = "systemd"
+                        PID = "1"
+                        message = "man-db.service: Succeeded."
+                    },
+                    [PSCustomObject]@{
+                        month = "Sep"
+                        day = "18"
+                        time = "00:00:31"
+                        hostname = "exampleserver"
+                        daemon = "systemd"
+                        PID = "1"
+                        message = "Finished Daily man-db regeneration."
+                    },
+                    [PSCustomObject]@{
+                        month = "Sep"
+                        day = "18"
+                        time = "00:10:36"
+                        hostname = "exampleserver"
+                        daemon = "python3"
+                        PID = "357033"
+                        message = "2022-09-18T00:10:36.925728Z INFO ExtHandler ExtHandler [HEARTBEAT] Agent WALinuxAgent-2.8.0.11 is running as the goal state agent [DEBUG HeartbeatCounter: 915;HeartbeatId: 00000000-0000-0000-0000-000000000000;DroppedPackets: 0;UpdateGSErrors: 0;AutoUpdate: 1]"
+                    }
+                )
+                AdditionalParameters = @{}
             }
         ) {
             $ActualValue = $InputString | ConvertFrom-RegEx -Pattern $Regex @AdditionalParameters

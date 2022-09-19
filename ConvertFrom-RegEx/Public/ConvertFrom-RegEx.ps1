@@ -157,7 +157,8 @@ function ConvertFrom-RegEx {
                     | ForEach-Object `
                         -Begin {
                             [Diagnostics.CodeAnalysis.SuppressMessage(
-                                MessageId ='PSUseDeclaredVarsMoreThanAssignments',
+                                'PSUseDeclaredVarsMoreThanAssignments',
+                                '',
                                 Justification = 'Variable is used in downstream scope'
                             )]
                             $out = [ordered]@{}

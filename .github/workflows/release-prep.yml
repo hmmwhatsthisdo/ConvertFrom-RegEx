@@ -21,7 +21,7 @@ jobs:
           Write-Host "::set-output name=ModuleVersion::$ModuleVersion"
       - name: Ensure Branch Version Match
         uses: actions/github-script@v6
-        if: ${{github.event.pull_request.base_ref != format("release/{0}", steps.module-manifest-version.output.ModuleVersion)}}
+        if: "${{github.event.pull_request.base_ref != format('release/{0}', steps.module-manifest-version.output.ModuleVersion)}}"
         with:
           script: |
             core.setFailed('Version in base branch name (${{ github.event.pull_request.base_ref }}) and manifest ${{ steps.module-manifest-version.output.ModuleVersion }} do not match.')

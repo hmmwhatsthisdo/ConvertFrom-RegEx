@@ -30,6 +30,7 @@ jobs:
           Invoke-Pester -CI -Verbose
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
         with:
           nunit_files: "**.xml"
       

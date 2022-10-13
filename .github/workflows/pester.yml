@@ -22,6 +22,7 @@ jobs:
         shell: powershell
         run: |
           Write-Verbose $PWD -Verbose
+          Get-ChildItem -Recurse
           Invoke-Pester -CI -Verbose
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2

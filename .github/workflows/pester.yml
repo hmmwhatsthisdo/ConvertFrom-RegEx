@@ -23,7 +23,7 @@ jobs:
           Install-Module -Name Pester -RequiredVersion $env:PESTER_VERSION -Force -AllowClobber
           Install-Module -Name Assert -RequiredVersion $env:ASSERT_VERSION -Force -AllowClobber
       - name: "Invoke Tests"
-        shell: powershell
+        shell: pwsh
         run: |
           Write-Verbose $PWD -Verbose
           Write-Verbose (Get-ChildItem -Recurse | Out-String) -Verbose

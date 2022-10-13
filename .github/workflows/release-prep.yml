@@ -13,6 +13,8 @@ jobs:
     name: Check Branch/Manifest version
     runs-on: windows-latest
     steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
       - shell: pwsh
         name: Get Manifest Version
         id: module-manifest-version

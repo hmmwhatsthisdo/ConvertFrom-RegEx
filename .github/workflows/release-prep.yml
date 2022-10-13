@@ -27,3 +27,14 @@ jobs:
         with:
           script: |
             core.setFailed('Version in head branch name (${{ github.event.pull_request.head.ref }}) and manifest ${{ steps.module-manifest-version.outputs.ModuleVersion }} do not match.')
+  approve:
+    name: Approve PR
+    runs-on: windows-latest
+    needs:
+      - match_versions
+    steps:
+      - name: "Approve PR"
+        uses: juliangruber/approve-pull-request-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ github.event.pull_request.number }}

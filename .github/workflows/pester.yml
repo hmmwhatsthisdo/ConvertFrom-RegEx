@@ -21,7 +21,7 @@ jobs:
       - name: "Invoke Tests"
         shell: powershell
         run: |
-          Invoke-Pester -CI
+          Invoke-Pester -CI -Verbose
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:

@@ -1,0 +1,27 @@
+name: Release Preparation
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - 'main'
+
+jobs:
+  match_versions:
+    name: Check Branch/Manifest version
+    runs-on: windows-latest
+    steps:
+      - shell: pwsh
+        name: Get Manifest Version
+        id: module-manifest-version
+        run: |
+          $ModuleVersion = (Import-PowerShellDataFile -Path .\ConvertFrom-RegEx\ConvertFrom-RegEx.psd1).ModuleVersion
+          Write-Host "::set-output name=ModuleVersion::$ModuleVersion"
+      - name: Ensure Branch Version Match
+        uses: actions/github-script@v6
+        if: ${{github.event.pull_request.base_ref != "release/" + steps.module-manifest-version.output.ModuleVersion}}
+        with:
+          script: |
+            core.setFailed('Version in base branch name (${{ github.event.pull_request.base_ref }}) and manifest ${{ steps.module-manifest-version.output.ModuleVersion }} do not match.')

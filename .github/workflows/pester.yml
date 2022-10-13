@@ -29,7 +29,7 @@ jobs:
           Write-Verbose (Get-ChildItem -Recurse | Out-String) -Verbose
           Invoke-Pester -CI -Verbose
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
+        uses: EnricoMi/publish-unit-test-result-action/composite@v2
         if: always()
         with:
           nunit_files: "**.xml"

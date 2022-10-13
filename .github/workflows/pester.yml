@@ -1,0 +1,35 @@
+name: Pester Tests
+on:
+  push:
+    branches:
+      - "feature/**"
+      - "develop"
+      - "release/**"
+      - "hotfix/**"
+      - "main"
+
+env:
+  PESTER_VERSION: 5.3.3
+  ASSERT_VERSION: 0.9.5
+jobs:
+  pester:
+    runs-on: windows-latest
+    name: "Run Pester Tests"
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Install Dependencies"
+        shell: pwsh
+        run: |
+          Install-Module -Name Pester -RequiredVersion $env:PESTER_VERSION -Force -AllowClobber
+          Install-Module -Name Assert -RequiredVersion $env:ASSERT_VERSION -Force -AllowClobber
+      - name: "Invoke Tests"
+        shell: pwsh
+        run: |
+          Invoke-Pester -CI -Verbose
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action/composite@v2
+        if: always()
+        with:
+          nunit_files: "**.xml"
+      

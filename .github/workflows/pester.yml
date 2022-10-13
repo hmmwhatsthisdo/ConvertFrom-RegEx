@@ -7,6 +7,7 @@ on:
       - "release/**"
       - "hotfix/**"
       - "main"
+
 env:
   PESTER_VERSION: 5.3.3
   ASSERT_VERSION: 0.9.5
@@ -25,8 +26,6 @@ jobs:
       - name: "Invoke Tests"
         shell: pwsh
         run: |
-          Write-Verbose $PWD -Verbose
-          Write-Verbose (Get-ChildItem -Recurse | Out-String) -Verbose
           Invoke-Pester -CI -Verbose
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action/composite@v2

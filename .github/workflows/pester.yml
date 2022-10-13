@@ -1,0 +1,29 @@
+name: Pester Tests
+on:
+  push:
+    branches:
+      - "feature/**"
+      - "develop"
+      - "release/**"
+      - "hotfix/**"
+      - "main"
+env:
+  PESTER_VERSION: 5.3.3
+jobs:
+  pester:
+    runs-on: windows-latest
+    name: "Run Pester Tests"
+    steps:
+      - name: "Install Pester"
+        shell: powershell
+        run: |
+          Install-Module -Name Pester -RequiredVersion $env:PESTER_VERSION -Force -AllowClobber
+      - name: "Invoke Tests"
+        shell: powershell
+        run: |
+          Invoke-Pester -CI
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        with:
+          nunit_files: "**.xml"
+      

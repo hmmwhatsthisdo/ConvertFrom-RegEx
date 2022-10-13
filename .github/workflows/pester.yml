@@ -9,6 +9,7 @@ on:
       - "main"
 env:
   PESTER_VERSION: 5.3.3
+  ASSERT_VERSION: 0.9.5
 jobs:
   pester:
     runs-on: windows-latest
@@ -16,10 +17,11 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@v3
-      - name: "Install Pester"
-        shell: powershell
+      - name: "Install Dependencies"
+        shell: pwsh
         run: |
           Install-Module -Name Pester -RequiredVersion $env:PESTER_VERSION -Force -AllowClobber
+          Install-Module -Name Assert -RequiredVersion $env:ASSERT_VERSION -Force -AllowClobber
       - name: "Invoke Tests"
         shell: powershell
         run: |

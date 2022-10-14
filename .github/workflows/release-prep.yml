@@ -36,10 +36,13 @@ jobs:
       - name: "Test tag presence"
         shell: pwsh
         run: |
-          git ls-remote --exit-code origin regs/tags/v${{ github.event.pull_request.head.ref }} | Out-Null
+          $ModuleVersion = '${{ github.event.pull_request.head.ref }}' -replace '^[^\/]+//'
+          git ls-remote --exit-code origin regs/tags/v$ModuleVersion | Out-Null
           if ($LASTEXITCODE -eq 0) {
-              Write-Host "::error Tag 'v${{ github.event.pull_request.head.ref }}' already exists"
+              Write-Host "::error Tag '$ModuleVersion' already exists"
               exit 1
+          } else {
+            exit 0
           }
 
   approve:

@@ -57,8 +57,26 @@ jobs:
           name: module
           path: .\ConvertFrom-RegEx\**
           if-no-files-found: error
-
-
+  tag:
+    name: "Add git tag"
+    runs-on: windows-latest
+    needs: prerelease_version
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Add tag annotation"
+        shell: pwsh
+        env:
+          PRERELEASE_STRING: ${{ needs.prerelease_version.outputs.PrereleaseString }}
+        run: |
+          $ModuleVersion = (Import-PowerShellDataFile -Path .\ConvertFrom-RegEx\ConvertFrom-RegEx.psd1).ModuleVersion
+          if ($env:PRERELEASE_STRING) {
+            $VersionString = '{0}-{1}' -f ($ModuleVersion,$env:PRERELEASE_STRING)
+          } Else {
+            $VersionString = $ModuleVersion
+          }
+          git tag -a -m "Release $VersionString"
+          git push --tags origin
   
 
 

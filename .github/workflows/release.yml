@@ -10,7 +10,7 @@ jobs:
   prerelease_version:
     name: "Calculate Prerelease Version"
     runs-on: windows-latest
-    if: ${{ startsWith(github.ref_name, "release/") || startsWith(github.ref_name, "hotfix/") }}
+    if: ${{ startsWith(github.ref_name, 'release/') || startsWith(github.ref_name, 'hotfix/') }}
     outputs:
       PrereleaseString: ${{ steps.new_prerelease.outputs.NewPrerelease }}
     steps:

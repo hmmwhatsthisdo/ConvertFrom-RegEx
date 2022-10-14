@@ -75,7 +75,7 @@ jobs:
           } Else {
             $VersionString = $ModuleVersion
           }
-          git tag -a -m "Release $VersionString"
+          git tag -a -m "Release $VersionString" "v$VersionString"
           git push --tags origin
   
 

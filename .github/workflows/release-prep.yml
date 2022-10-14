@@ -27,11 +27,27 @@ jobs:
         with:
           script: |
             core.setFailed('Version in head branch name (${{ github.event.pull_request.head.ref }}) and manifest ${{ steps.module-manifest-version.outputs.ModuleVersion }} do not match.')
+  verify_no_tag:
+    name: Ensure New Version
+    runs-on: windows-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Test tag presence"
+        shell: pwsh
+        run: |
+          git ls-remote --exit-code origin regs/tags/v${{ github.event.pull_request.head.ref }} | Out-Null
+          if ($LASTEXITCODE -eq 0) {
+              Write-Host "::error Tag 'v${{ github.event.pull_request.head.ref }}' already exists"
+              exit 1
+          }
+
   approve:
     name: Approve PR
     runs-on: windows-latest
     needs:
       - match_versions
+      - verify_no_tag
     steps:
       - name: "Approve PR"
         uses: juliangruber/approve-pull-request-action@v1

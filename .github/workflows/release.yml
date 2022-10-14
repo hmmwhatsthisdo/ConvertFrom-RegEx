@@ -26,7 +26,7 @@ jobs:
           $Tags = git tag -l $("v{0}-rc*" -f $ModuleVersion)
           $PrereleaseVersions = $Tags | % {[semver](($_ -replace '^v',''))}
           $LatestPrerelease = $PrereleaseVersions | ? PreReleaseLabel -like '^rc\d+$'| Sort -Descending | Select -first 1 | % PreReleaseLabel
-          Write-Host "::set-output LatestPrerelease=$LatestPrerelease"
+          Write-Host "::set-output name=LatestPrerelease::$LatestPrerelease"
       - name: "Calculate New Prerelease"
         id: new_prerelease
         shell: pwsh
@@ -36,7 +36,7 @@ jobs:
           $PreviousPrerelease = $env:LATEST_PRERELEASE
           $PrereleaseCount = ($PreviousPrerelease -replace '^rc','') -as [int]
           $NewPrerelease = 'rc{0:D2}' -f ($PrereleaseCount + 1)
-          Write-Host "::set-output NewPrerelease=$NewPrerelease"
+          Write-Host "::set-output name=NewPrerelease::$NewPrerelease"
   package:
     name: "Package module"
     runs-on: windows-latest

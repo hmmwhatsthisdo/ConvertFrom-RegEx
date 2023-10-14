@@ -139,7 +139,7 @@ jobs:
     runs-on: windows-latest
     needs: 
       - tag_and_version
-      - package-build
+      - package-release
     steps:
       - name: "Retrieve ZIP Artifact"
         uses: actions/download-artifact@v3

@@ -110,6 +110,7 @@ jobs:
       - name: "Create Module ZIP"
         shell: pwsh
         run: |
+          New-Item -ItemType Directory -Path .\release-artifacts
           Compress-Archive -Path .\build-artifacts\modules\ConvertFrom-RegEx\* -DestinationPath .\release-artifacts\ConvertFrom-RegEx.zip
       - name: "Publish ZIP Artifact"
         uses: actions/upload-artifact@v3

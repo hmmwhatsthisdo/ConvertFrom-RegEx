@@ -128,6 +128,7 @@ jobs:
           New-Item -ItemType Directory -Path .\packagemanagement\powershellget\LocalPSRepo | Set-Variable LocalPSRepoPath
           Register-PSRepository -Name LocalPSRepo -SourceLocation ($LocalPSRepoPath.FullName)
           Publish-Module -Path .\build-artifacts\modules\ConvertFrom-RegEx -Repository LocalPSRepo
+          Write-Verbose $(Get-ChildItem $LocalPSRepoPath -Recurse | Out-String) -Verbose
       - name: "Upload NuPkg artifact"
         uses: actions/upload-artifact@v3
         with:

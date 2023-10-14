@@ -115,9 +115,9 @@ jobs:
         shell: pwsh
         working-directory: .\build-artifacts_zipped
         run: |
-          Write-Host $PWD
           $ErrorView = [System.Management.Automation.ErrorView]::DetailedView
           Get-ChildItem $PWD -File -Recurse | ForEach-Object {
+            Write-Verbose "Expanding $_..." -Verbose
             $SplitPath = Resolve-Path $_ -Relative
             New-Item -ItemType Directory -Path ..\build-artifacts\$SplitPath -Force | Set-Variable TargetPath
             Expand-Archive -Path $_ -DestinationPath $TargetPath

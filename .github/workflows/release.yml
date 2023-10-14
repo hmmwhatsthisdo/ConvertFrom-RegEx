@@ -110,18 +110,7 @@ jobs:
         uses: actions/download-artifact@v3 
         with:
           name: build_module
-          path: .\build-artifacts_zipped\modules\ConvertFrom-RegEx
-      - name: "Decompress build artifacts"
-        shell: pwsh
-        working-directory: .\build-artifacts_zipped
-        run: |
-          $ErrorView = [System.Management.Automation.ErrorView]::DetailedView
-          Get-ChildItem $PWD -File -Recurse | ForEach-Object {
-            Write-Verbose "Expanding $_..." -Verbose
-            $SplitPath = Resolve-Path $_ -Relative
-            New-Item -ItemType Directory -Path ..\build-artifacts\$SplitPath -Force | Set-Variable TargetPath
-            Expand-Archive -Path $_ -DestinationPath $TargetPath
-          }
+          path: .\build-artifacts\modules\ConvertFrom-RegEx
       - name: "Create Module ZIP"
         shell: pwsh
         run: |

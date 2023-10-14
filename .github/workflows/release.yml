@@ -7,19 +7,22 @@ on:
       - "main"
 
 jobs:
-  prerelease_version:
-    name: "Calculate Prerelease Version"
+  tag_and_version:
+    name: "Add git tag"
     runs-on: windows-latest
-    if: ${{ startsWith(github.ref_name, 'release/') || startsWith(github.ref_name, 'hotfix/') }}
+    if: always()
     outputs:
+      ModuleVersionString: ${{ steps.tag_annotation.outputs.FullVersionString }}
       PrereleaseString: ${{ steps.new_prerelease.outputs.NewPrerelease }}
+      GitTagName: ${{ steps.tag_annotation.outputs.GitTagName }}
     steps:
       - name: "Checkout"
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: "Get Previous Prerelease"
+      - name: "Set Git identity"
+        uses: fregante/setup-git-user@v1
+      - name: "[Prerelease only] Get Previous Prerelease"
         id: previous_prerelease
+        if: ${{ startsWith(github.ref_name, 'release/') || startsWith(github.ref_name, 'hotfix/') }}
         shell: pwsh
         run: |
           $ModuleVersion = (Import-PowerShellDataFile -Path .\ConvertFrom-RegEx\ConvertFrom-RegEx.psd1).ModuleVersion
@@ -27,8 +30,9 @@ jobs:
           $PrereleaseVersions = $Tags | % {[semver](($_ -replace '^v',''))}
           $LatestPrerelease = $PrereleaseVersions | ? PreReleaseLabel -match '^rc\d+$'| Sort -Descending | Select -first 1 | % PreReleaseLabel
           Write-Host "::set-output name=LatestPrerelease::$LatestPrerelease"
-      - name: "Calculate New Prerelease"
+      - name: "[Prerelease only] Calculate New Prerelease"
         id: new_prerelease
+        if: ${{ startsWith(github.ref_name, 'release/') || startsWith(github.ref_name, 'hotfix/') }}
         shell: pwsh
         env:
           LATEST_PRERELEASE: ${{ steps.previous_prerelease.outputs.LatestPrerelease }}
@@ -37,25 +41,11 @@ jobs:
           $PrereleaseCount = ($PreviousPrerelease -replace '^rc','') -as [int]
           $NewPrerelease = 'rc{0:D2}' -f ($PrereleaseCount + 1)
           Write-Host "::set-output name=NewPrerelease::$NewPrerelease"
-  tag_and_version:
-    name: "Add git tag"
-    runs-on: windows-latest
-    needs: prerelease_version
-    if: always()
-    outputs:
-      ModuleVersionString: ${{ steps.tag_annotation.outputs.FullVersionString }}
-      PrereleaseString: ${{ needs.prerelease_version.outputs.PrereleaseString }}
-      GitTagName: ${{ steps.tag_annotation.outputs.GitTagName }}
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@v3
-      - name: "Set Git identity"
-        uses: fregante/setup-git-user@v1
       - name: "Add tag annotation"
         id: tag_annotation
         shell: pwsh
         env:
-          PRERELEASE_STRING: ${{ needs.prerelease_version.outputs.PrereleaseString }}
+          PRERELEASE_STRING: ${{ steps.new_prerelease.outputs.NewPrerelease }}
         run: |
           $BareVersionString = (Import-PowerShellDataFile -Path .\ConvertFrom-RegEx\ConvertFrom-RegEx.psd1).ModuleVersion
           Write-Host "::set-output name=BareVersionString::$BareVersionString"

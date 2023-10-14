@@ -6,7 +6,13 @@ on:
       - "develop"
       - "release/**"
       - "hotfix/**"
-      - "main"
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - 'main'
 
 env:
   PESTER_VERSION: 5.3.3

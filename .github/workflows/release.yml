@@ -92,7 +92,7 @@ jobs:
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v3
         with:
-          name: build::module
+          name: build_module
           path: .\ConvertFrom-RegEx\**
           if-no-files-found: error
   package-release:
@@ -105,7 +105,7 @@ jobs:
       - name: "Retrieve build artifacts"
         uses: actions/download-artifact@v3 
         with:
-          name: build::module
+          name: build_module
           path: .\build-artifacts\modules\ConvertFrom-RegEx
       - name: "Create Module ZIP"
         shell: pwsh
@@ -114,7 +114,7 @@ jobs:
       - name: "Publish ZIP Artifact"
         uses: actions/upload-artifact@v3
         with:
-          name: release::zip
+          name: release_zip
           path: .\release-artifacts\ConvertFrom-RegEx.zip
           if-no-files-found: error
       - name: "Publish to local PowerShellGet repository"
@@ -126,7 +126,7 @@ jobs:
       - name: "Upload NuPkg artifact"
         uses: actions/upload-artifact@v3
         with:
-          name: release::nupkg
+          name: release_nupkg
           path: .\packagemanagement\powershellget\LocalPSRepo\ConvertFrom-RegEx.${{needs.tag_and_version.outputs.BareModuleVersionString}}.nupkg
           if-no-files-found: error          
   release-github:
@@ -139,12 +139,12 @@ jobs:
       - name: "Retrieve ZIP Artifact"
         uses: actions/download-artifact@v3
         with:
-          name: release::zip
+          name: release_zip
           path: .\release-artifacts\
       - name: "Retrieve NuPkg Artifact"
         uses: actions/download-artifact@v3
         with:
-          name: release::nupkg
+          name: release_nupkg
           path: .\release-artifacts\
       - name: "Create Release"
         uses: ncipollo/release-action@v1.13.0

@@ -41,9 +41,11 @@ jobs:
     name: "Add git tag"
     runs-on: windows-latest
     needs: prerelease_version
+    if: always()
     outputs:
       FullModuleVersionString: ${{ steps.tag_annotation.outputs.FullVersionString }}
-      BareModuleVersionString: ${{ steps.tag_annotation.outputs.BareVersionString }}
+      BaseModuleVersionString: ${{ steps.tag_annotation.outputs.BareVersionString }}
+      PrereleaseString: ${{ needs.prerelease_version.outputs.PrereleaseString }}
       GitTagName: ${{ steps.tag_annotation.outputs.GitTagName }}
     steps:
       - name: "Checkout"
@@ -75,16 +77,15 @@ jobs:
     name: "Package build artifacts"
     runs-on: windows-latest
     needs: 
-      - prerelease_version
       - tag_and_version
     steps:
       - name: "Checkout"
         uses: actions/checkout@v3
       - name: "Set Prerelease String"
-        if: ${{ needs.prerelease_version.outputs.PrereleaseString }}
+        if: ${{ needs.tag_and_version.outputs.PrereleaseString }}
         shell: pwsh
         env:
-          PRERELEASE_STRING: ${{ needs.prerelease_version.outputs.PrereleaseString }}
+          PRERELEASE_STRING: ${{ needs.tag_and_version.outputs.PrereleaseString }}
         run: |
           Update-ModuleManifest -Path .\ConvertFrom-RegEx\ConvertFrom-RegEx.psd1 -Prerelease $env:PRERELEASE_STRING
       - name: "Set License URI"

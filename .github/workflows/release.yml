@@ -133,7 +133,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: release_nupkg
-          path: .\packagemanagement\powershellget\LocalPSRepo\ConvertFrom-RegEx.${{needs.tag_and_version.outputs.BareModuleVersionString}}.nupkg
+          path: .\packagemanagement\powershellget\LocalPSRepo\ConvertFrom-RegEx.${{needs.tag_and_version.outputs.FullModuleVersionString}}.nupkg
           if-no-files-found: error          
   release-github:
     name: "Upload release to GitHub"

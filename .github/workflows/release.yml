@@ -29,6 +29,7 @@ jobs:
           $Tags = git tag -l $("v{0}-rc*" -f $ModuleVersion)
           $PrereleaseVersions = $Tags | % {[semver](($_ -replace '^v',''))}
           $LatestPrerelease = $PrereleaseVersions | ? PreReleaseLabel -match '^rc\d+$'| Sort -Descending | Select -first 1 | % PreReleaseLabel
+          Write-Verbose "Latest Prerelease for $ModuleVersion is $LatestPrerelease" -Verbose
           Write-Host "::set-output name=LatestPrerelease::$LatestPrerelease"
       - name: "[Prerelease only] Calculate New Prerelease"
         id: new_prerelease

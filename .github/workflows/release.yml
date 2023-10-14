@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: "Set Git identity"
         uses: fregante/setup-git-user@v1
       - name: "[Prerelease only] Get Previous Prerelease"
@@ -27,6 +29,7 @@ jobs:
         run: |
           $ModuleVersion = (Import-PowerShellDataFile -Path .\ConvertFrom-RegEx\ConvertFrom-RegEx.psd1).ModuleVersion
           $Tags = git tag -l $("v{0}-rc*" -f $ModuleVersion)
+          Write-Verbose "Tags for version "
           $PrereleaseVersions = $Tags | % {[semver](($_ -replace '^v',''))}
           $LatestPrerelease = $PrereleaseVersions | ? PreReleaseLabel -match '^rc\d+$'| Sort -Descending | Select -first 1 | % PreReleaseLabel
           Write-Verbose "Latest Prerelease for $ModuleVersion is $LatestPrerelease" -Verbose

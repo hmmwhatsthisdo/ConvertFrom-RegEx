@@ -37,10 +37,42 @@ jobs:
           $PrereleaseCount = ($PreviousPrerelease -replace '^rc','') -as [int]
           $NewPrerelease = 'rc{0:D2}' -f ($PrereleaseCount + 1)
           Write-Host "::set-output name=NewPrerelease::$NewPrerelease"
-  package:
-    name: "Package module"
+  tag_and_version:
+    name: "Add git tag"
     runs-on: windows-latest
     needs: prerelease_version
+    outputs:
+      FullModuleVersionString: ${{ steps.tag_annotation.outputs.FullVersionString }}
+      BareModuleVersionString: ${{ steps.tag_annotation.outputs.BareVersionString }}
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Set Git identity"
+        uses: fregante/setup-git-user@v1
+      - name: "Add tag annotation"
+        id: tag_annotation
+        shell: pwsh
+        env:
+          PRERELEASE_STRING: ${{ needs.prerelease_version.outputs.PrereleaseString }}
+        run: |
+          $BareVersionString = (Import-PowerShellDataFile -Path .\ConvertFrom-RegEx\ConvertFrom-RegEx.psd1).ModuleVersion
+          Write-Host "::set-output name=BareVersionString::$BareVersionString"
+
+          if ($env:PRERELEASE_STRING) {
+            $FullVersionString = '{0}-{1}' -f ($BareVersionString,$env:PRERELEASE_STRING)
+          } Else {
+            $FullVersionString = $BareVersionString
+          }
+
+          git tag -a -m "Release $FullVersionString" "v$FullVersionString"
+          git push --tags origin
+          Write-Host "::set-output name=FullVersionString::$FullVersionString"
+  package-build:
+    name: "Package build artifacts"
+    runs-on: windows-latest
+    needs: 
+      - prerelease_version
+      - tag_and_version
     steps:
       - name: "Checkout"
         uses: actions/checkout@v3
@@ -51,34 +83,84 @@ jobs:
           PRERELEASE_STRING: ${{ needs.prerelease_version.outputs.PrereleaseString }}
         run: |
           Update-ModuleManifest -Path .\ConvertFrom-RegEx\ConvertFrom-RegEx.psd1 -Prerelease $env:PRERELEASE_STRING
+      - name: "Set License URI"
+        shell: pwsh
+        env:
+          LICENSE_URI: ${{format('{0}/{1}/blob/{2}/LICENSE', github.server_url, github.repository, needs.tag_and_version.outputs.FullModuleVersionString)}}
+        run: |
+          Update-ModuleManifest -Path .\ConvertFrom-RegEx\ConvertFrom-RegEx.psd1 -LicenseURI $env:LICENSE_URI
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v3
         with:
-          name: module
+          name: build::module
           path: .\ConvertFrom-RegEx\**
           if-no-files-found: error
-  tag:
-    name: "Add git tag"
+  package-release:
+    name: "Create release artifacts"
     runs-on: windows-latest
-    needs: prerelease_version
+    needs: 
+      - tag_and_version
+      - package-build
     steps:
-      - name: "Checkout"
-        uses: actions/checkout@v3
-      - name: "Set Git identity"
-        uses: fregante/setup-git-user@v1
-      - name: "Add tag annotation"
+      - name: "Retrieve build artifacts"
+        uses: actions/download-artifact@v3 
+        with:
+          name: build::module
+          path: .\build-artifacts\modules\ConvertFrom-RegEx
+      - name: "Create Module ZIP"
         shell: pwsh
-        env:
-          PRERELEASE_STRING: ${{ needs.prerelease_version.outputs.PrereleaseString }}
         run: |
-          $ModuleVersion = (Import-PowerShellDataFile -Path .\ConvertFrom-RegEx\ConvertFrom-RegEx.psd1).ModuleVersion
-          if ($env:PRERELEASE_STRING) {
-            $VersionString = '{0}-{1}' -f ($ModuleVersion,$env:PRERELEASE_STRING)
-          } Else {
-            $VersionString = $ModuleVersion
-          }
-          git tag -a -m "Release $VersionString" "v$VersionString"
-          git push --tags origin
-  
+          Compress-Archive -Path .\build-artifacts\modules\ConvertFrom-RegEx\* -DestinationPath .\release-artifacts\ConvertFrom-RegEx.zip
+      - name: "Publish ZIP Artifact"
+        uses: actions/upload-artifact@v3
+        with:
+          name: release::zip
+          path: .\release-artifacts\ConvertFrom-RegEx.zip
+          if-no-files-found: error
+      - name: "Publish to local PowerShellGet repository"
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path .\packagemanagement\powershellget\LocalPSRepo | Set-Variable LocalPSRepoPath
+          Register-PSRepository -Name LocalPSRepo -SourceLocation $(LocalPSRepoPath)
+          Publish-Module -Path .\build-artifacts\modules\ConvertFrom-RegEx -Repository LocalPSRepo
+      - name: "Upload NuPkg artifact"
+        uses: actions/upload-artifact@v3
+        with:
+          name: release::nupkg
+          path: .\packagemanagement\powershellget\LocalPSRepo\ConvertFrom-RegEx.${{needs.tag_and_version.outputs.BareModuleVersionString}}.nupkg
+          if-no-files-found: error          
+  release-github:
+    name: "Upload release to GitHub"
+    runs-on: windows-latest
+    needs: 
+      - tag_and_version
+      - package-build
+    steps:
+      - name: "Retrieve ZIP Artifact"
+        uses: actions/download-artifact@v3
+        with:
+          name: release::zip
+          path: .\release-artifacts\
+      - name: "Retrieve NuPkg Artifact"
+        uses: actions/download-artifact@v3
+        with:
+          name: release::nupkg
+          path: .\release-artifacts\
+      - name: "Create Release"
+        uses: ncipollo/release-action@v1.13.0
+        with:
+          tag: ${{ format('v{0}', needs.tag_and_version.outputs.FullModuleVersionString) }}
+          prerelease: ${{ startsWith(github.ref_name, 'release/') || startsWith(github.ref_name, 'hotfix/') }}
+          artifacts: .\release-artifacts\*
+
+  # release-gallery:
+  #   name: "Upload to PowerShell Gallery"
+  #   runs-on: windows-latest
+  #   needs:
+  #     - tag_and_version
+  #     - package-build
+  #   steps:
+  #     - name: "Retrieve Module Artifact"
+  #     - name: "Publish to PowerShell Gallery"
 
 

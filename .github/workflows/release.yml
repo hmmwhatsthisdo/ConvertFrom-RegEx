@@ -165,6 +165,7 @@ jobs:
     needs:
       - tag_and_version
       - package-release
+    environment: PowerShell Gallery
     steps:
       - name: "Retrieve Module Artifact"
         uses: actions/download-artifact@v3

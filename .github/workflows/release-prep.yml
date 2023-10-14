@@ -1,0 +1,59 @@
+name: Release Preparation
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - 'main'
+
+jobs:
+  match_versions:
+    name: Check Branch/Manifest version
+    runs-on: windows-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - shell: pwsh
+        name: Get Manifest Version
+        id: module-manifest-version
+        run: |
+          $ModuleVersion = (Import-PowerShellDataFile -Path .\ConvertFrom-RegEx\ConvertFrom-RegEx.psd1).ModuleVersion
+          Write-Host "::set-output name=ModuleVersion::$ModuleVersion"
+      - name: Ensure Branch Version Match
+        uses: actions/github-script@v6
+        if: "${{github.event.pull_request.head.ref != format('release/{0}', steps.module-manifest-version.outputs.ModuleVersion)}}"
+        with:
+          script: |
+            core.setFailed('Version in head branch name (${{ github.event.pull_request.head.ref }}) and manifest ${{ steps.module-manifest-version.outputs.ModuleVersion }} do not match.')
+  verify_no_tag:
+    name: Ensure New Version
+    runs-on: windows-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v3
+      - name: "Test tag presence"
+        shell: pwsh
+        run: |
+          $ModuleVersion = '${{ github.event.pull_request.head.ref }}' -replace '^[^\/]+//'
+          git ls-remote --exit-code origin regs/tags/v$ModuleVersion | Out-Null
+          if ($LASTEXITCODE -eq 0) {
+              Write-Host "::error Tag '$ModuleVersion' already exists"
+              exit 1
+          } else {
+            exit 0
+          }
+
+  approve:
+    name: Approve PR
+    runs-on: windows-latest
+    needs:
+      - match_versions
+      - verify_no_tag
+    steps:
+      - name: "Approve PR"
+        uses: juliangruber/approve-pull-request-action@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ github.event.pull_request.number }}

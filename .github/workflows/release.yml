@@ -25,7 +25,7 @@ jobs:
           $ModuleVersion = (Import-PowerShellDataFile -Path .\ConvertFrom-RegEx\ConvertFrom-RegEx.psd1).ModuleVersion
           $Tags = git tag -l $("v{0}-rc*" -f $ModuleVersion)
           $PrereleaseVersions = $Tags | % {[semver](($_ -replace '^v',''))}
-          $LatestPrerelease = $PrereleaseVersions | ? PreReleaseLabel -like '^rc\d+$'| Sort -Descending | Select -first 1 | % PreReleaseLabel
+          $LatestPrerelease = $PrereleaseVersions | ? PreReleaseLabel -match '^rc\d+$'| Sort -Descending | Select -first 1 | % PreReleaseLabel
           Write-Host "::set-output name=LatestPrerelease::$LatestPrerelease"
       - name: "Calculate New Prerelease"
         id: new_prerelease

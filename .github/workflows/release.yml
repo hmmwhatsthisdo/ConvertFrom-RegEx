@@ -115,6 +115,7 @@ jobs:
         shell: pwsh
         working-directory: .\build-artifacts_zipped
         run: |
+          Write-Host $PWD
           Get-ChildItem -File -Recurse | ForEach-Object {
             $SplitPath = Resolve-Path $_ -Relative
             New-Item -ItemType Directory -Path ..\build-artifacts\$SplitPath -Force | Set-Variable TargetPath

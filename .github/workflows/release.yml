@@ -126,7 +126,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Path .\packagemanagement\powershellget\LocalPSRepo | Set-Variable LocalPSRepoPath
-          Register-PSRepository -Name LocalPSRepo -SourceLocation $(LocalPSRepoPath)
+          Register-PSRepository -Name LocalPSRepo -SourceLocation $LocalPSRepoPath
           Publish-Module -Path .\build-artifacts\modules\ConvertFrom-RegEx -Repository LocalPSRepo
       - name: "Upload NuPkg artifact"
         uses: actions/upload-artifact@v3

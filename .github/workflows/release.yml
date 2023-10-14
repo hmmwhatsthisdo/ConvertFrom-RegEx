@@ -116,7 +116,8 @@ jobs:
         working-directory: .\build-artifacts_zipped
         run: |
           Write-Host $PWD
-          Get-ChildItem -File -Recurse | ForEach-Object {
+          $ErrorView = [System.Management.Automation.ErrorView]::DetailedView
+          Get-ChildItem $PWD -File -Recurse | ForEach-Object {
             $SplitPath = Resolve-Path $_ -Relative
             New-Item -ItemType Directory -Path ..\build-artifacts\$SplitPath -Force | Set-Variable TargetPath
             Expand-Archive -Path $_ -DestinationPath $TargetPath

@@ -178,7 +178,7 @@ jobs:
           MODULE_VERSION: ${{ needs.tag_and_version.outputs.FullModuleVersionString }}
           PSGALLERY_API_KEY: ${{ secrets.POWERSHELLGALLERY_API }}
         run: |
-          Register-PSRepository -SourceLocation $(Resolve-Path .\release-artifacts | % Path) -Name LocalPSRepo
+          Register-PSRepository -SourceLocation $(Resolve-Path .\release-artifacts | % Path) -Name LocalPSRepo -InstallationPolicy Trusted
           Install-Module ConvertFrom-Regex -AllowPreRelease -RequiredVersion $env:MODULE_VERSION -Repository LocalPSRepo
           Publish-Module -Name ConvertFrom-RegEx -NuGetApiKey $env:PSGALLERY_API_KEY
 

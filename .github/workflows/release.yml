@@ -44,6 +44,7 @@ jobs:
     outputs:
       FullModuleVersionString: ${{ steps.tag_annotation.outputs.FullVersionString }}
       BareModuleVersionString: ${{ steps.tag_annotation.outputs.BareVersionString }}
+      GitTagName: ${{ steps.tag_annotation.outputs.GitTagName }}
     steps:
       - name: "Checkout"
         uses: actions/checkout@v3
@@ -64,7 +65,10 @@ jobs:
             $FullVersionString = $BareVersionString
           }
 
-          git tag -a -m "Release $FullVersionString" "v$FullVersionString"
+          $GitTagName = "v{0}" -f $FullVersionString
+          Write-Host "::set-output name=GitTagName::$GitTagName"
+
+          git tag -a -m "Release $FullVersionString" $GitTagName
           git push --tags origin
           Write-Host "::set-output name=FullVersionString::$FullVersionString"
   package-build:
@@ -86,7 +90,7 @@ jobs:
       - name: "Set License URI"
         shell: pwsh
         env:
-          LICENSE_URI: ${{format('{0}/{1}/blob/{2}/LICENSE', github.server_url, github.repository, needs.tag_and_version.outputs.FullModuleVersionString)}}
+          LICENSE_URI: ${{format('{0}/{1}/blob/{2}/LICENSE', github.server_url, github.repository, needs.tag_and_version.outputs.GitTagName)}}
         run: |
           Update-ModuleManifest -Path .\ConvertFrom-RegEx\ConvertFrom-RegEx.psd1 -LicenseURI $env:LICENSE_URI
       - name: "Upload Artifact"
